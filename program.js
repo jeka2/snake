@@ -5,6 +5,7 @@ var y = 200;
 var snackX = 0;
 var snackY = 0;
 var turningPoints = [];
+var traveledLinks = [];
 var snackEaten = false;
 var changedDirection = false;
 var snake = [
@@ -44,11 +45,15 @@ function gameRun() {
 function checkForEaten() {
     if (head.x === snackX && head.y === snackY) {
         snackEaten = true;
-        var directionWorkedWith = tail.y != 0 ? 'y' : 'x';
+        var directionWorkedWith = tail.dy != 0 ? 'y' : 'x';
         if (directionWorkedWith === 'y') {
+            console.log('y');
             snake.push({ x: tail.x, y: (tail.y - tail.dy), dx: tail.dx, dy: tail.dy })
         }
-        else { snake.push({ x: (tail.x - tail.dx), y: tail.y, dx: tail.dx, dy: tail.dy }) }
+        else {
+            console.log('x');
+            snake.push({ x: (tail.x - tail.dx), y: tail.y, dx: tail.dx, dy: tail.dy })
+        }
     }
     else { snackEaten = false; }
 }
@@ -67,18 +72,25 @@ function checkForLoss() {
 function moveSnake() {
     canvasContext.fillStyle = 'black';
     canvasContext.fillRect(0, 0, canvas.clientWidth, canvas.height);
+
     snake.forEach(link => {
-        turningPoints.forEach(turn => {
+        for (let i = 0; i < turningPoints.length; i++) {
+            turn = turningPoints[i];
+            // make it so links that have already traveled that turn
+            // cannot be turned there again
             if (link.x === turn.x && link.y === turn.y) {
                 link.dx = turn.dx;
                 link.dy = turn.dy;
+
                 // once the tail touches the turning point, it needs to 
                 // be removed
                 if (turn.x === tail.x && turn.y === tail.y) {
                     turningPoints.shift();
                 }
+                traveledLinks[i].push(link);
             }
-        });
+        }
+
         link.x += link.dx;
         link.y += link.dy;
         canvasContext.fillStyle = 'red';
@@ -129,34 +141,42 @@ function gameOver() {
     console.log('game over');
 }
 
-window.addEventListener("keypress", (e) => {
-    switch (e.key) {
-        case 'a':
+window.addEventListener("keydown", (e) => {
+    switch (e.keyCode) {
+        case 65:
+        case 37:
             if (head.dy != 0) {
                 head.dx = -20;
                 head.dy = 0;
                 turningPoints.push({ x: head.x, y: head.y, dx: head.dx, dy: head.dy })
+                traveledLinks.push([]);
             }
             break;
-        case 's':
+        case 83:
+        case 40:
             if (head.dx != 0) {
                 head.dy = 20;
                 head.dx = 0;
                 turningPoints.push({ x: head.x, y: head.y, dx: head.dx, dy: head.dy })
+                traveledLinks.push([]);
             }
             break;
-        case 'w':
+        case 87:
+        case 38:
             if (head.dx != 0) {
                 head.dy = -20;
                 head.dx = 0;
                 turningPoints.push({ x: head.x, y: head.y, dx: head.dx, dy: head.dy })
+                traveledLinks.push([]);
             }
             break;
-        case 'd':
+        case 68:
+        case 39:
             if (head.dy != 0) {
                 head.dx = 20;
                 head.dy = 0;
                 turningPoints.push({ x: head.x, y: head.y, dx: head.dx, dy: head.dy })
+                traveledLinks.push([]);
             }
             break;
     };
