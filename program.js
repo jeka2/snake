@@ -47,11 +47,9 @@ function checkForEaten() {
         snackEaten = true;
         var directionWorkedWith = tail.dy != 0 ? 'y' : 'x';
         if (directionWorkedWith === 'y') {
-            console.log('y');
             snake.push({ x: tail.x, y: (tail.y - tail.dy), dx: tail.dx, dy: tail.dy })
         }
         else {
-            console.log('x');
             snake.push({ x: (tail.x - tail.dx), y: tail.y, dx: tail.dx, dy: tail.dy })
         }
     }
@@ -138,7 +136,7 @@ function checkY(ys) {
 }
 
 function gameOver() {
-    console.log('game over');
+    alert('Game Over');
 }
 
 window.addEventListener("keydown", (e) => {
