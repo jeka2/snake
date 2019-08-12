@@ -7,7 +7,7 @@ var snackEaten = false;
 var snake = [];
 var head;
 var tail;
-var ableToChangeDirection = new Date(Date.now() + 200);
+var score = 0;
 
 window.onload = function () {
     // main canvas
@@ -44,8 +44,16 @@ function gameRun() {
     }
 }
 
+function increaseScore() {
+    score++;
+    let points = document.getElementById('score');
+    points.innerHTML = `Score: ${score}`;
+}
+
 function checkForEaten() {
     if (head.x === snackX && head.y === snackY) {
+        increaseScore();
+
         snackEaten = true;
         var directionWorkedWith = tail.dy != 0 ? 'y' : 'x';
         if (directionWorkedWith === 'y') {
@@ -70,6 +78,7 @@ function checkForLoss() {
 }
 
 function moveSnake() {
+    let turnToBeRemoved = false;
     canvasContext.fillStyle = 'black';
     canvasContext.fillRect(0, 0, canvas.clientWidth, canvas.height);
     for (let i = 0; i < snake.length; i++) {
@@ -77,14 +86,16 @@ function moveSnake() {
         for (let j = 0; j < turningPoints.length; j++) {
             var turn = turningPoints[j];
             if (link.x === turn.x && link.y === turn.y) {
-
+                // The problem is here.
+                // The tail doesn't get the message that it needs to 
+                // Change direction
                 link.dx = turn.dx;
                 link.dy = turn.dy;
 
                 // once the tail touches the turning point, the point
                 // needs to be removed
                 if (turn.x === tail.x && turn.y === tail.y) {
-                    turningPoints.shift();
+                    turnToBeRemoved = true;
                 }
             }
         }
@@ -94,6 +105,7 @@ function moveSnake() {
         canvasContext.fillStyle = 'red';
         canvasContext.fillRect(link.x, link.y, 19, 19);
     }
+    if (turnToBeRemoved) { turningPoints.shift(); }
 }
 
 function maintainSnack() {
@@ -146,9 +158,6 @@ function gameOver() {
 }
 
 window.addEventListener("keydown", (e) => {
-    // This prevents button-mashing so the code can operate
-    if (Date.now() < ableToChangeDirection) { return; }
-    ableToChangeDirection = new Date(Date.now() + 300);
     // The cases create a turning point on the grid by which
     // all the snake pieces have to abide. So if the point says
     // that the snake went in the positive x direction, every
