@@ -23,11 +23,11 @@ window.onload = function () {
 
 function createSnake() {
     snake = [
-        { x: canvas.width / 2 + 40, y: canvas.height / 2, dx: 20, dy: 0, id: 1 },
-        { x: canvas.width / 2 + 20, y: canvas.height / 2, dx: 20, dy: 0, id: 2 },
-        { x: canvas.width / 2, y: canvas.height / 2, dx: 20, dy: 0, id: 3 },
-        { x: canvas.width / 2 - 20, y: canvas.height / 2, dx: 20, dy: 0, id: 4 },
-        { x: canvas.width / 2 - 40, y: canvas.height / 2, dx: 20, dy: 0, id: 5 },
+        { x: canvas.width / 2 + 40, y: canvas.height / 2, dx: 20, dy: 0 },
+        { x: canvas.width / 2 + 20, y: canvas.height / 2, dx: 20, dy: 0 },
+        { x: canvas.width / 2, y: canvas.height / 2, dx: 20, dy: 0 },
+        { x: canvas.width / 2 - 20, y: canvas.height / 2, dx: 20, dy: 0 },
+        { x: canvas.width / 2 - 40, y: canvas.height / 2, dx: 20, dy: 0 },
     ]
 }
 
@@ -62,25 +62,22 @@ function checkForEaten() {
         if (linkBeforeLast.dx != tail.dx && linkBeforeLast.dy != tail.dy) {
             directionWorkedWith = linkBeforeLast.dy != 0 ? 'y' : 'x';
             if (directionWorkedWith === 'y') {
-                debugger;
                 snake.push({ x: tail.x, y: (tail.y - linkBeforeLast.dy), dx: linkBeforeLast.dx, dy: linkBeforeLast.dy })
             }
             else {
-                debugger;
                 snake.push({ x: (tail.x - linkBeforeLast.dx), y: tail.y, dx: linkBeforeLast.dx, dy: linkBeforeLast.dy })
             }
         }
         else {
             directionWorkedWith = tail.dy != 0 ? 'y' : 'x';
             if (directionWorkedWith === 'y') {
-                snake.push({ x: tail.x, y: (tail.y - tail.dy), dx: tail.dx, dy: tail.dy, id: tail.id + 1 })
+                snake.push({ x: tail.x, y: (tail.y - tail.dy), dx: tail.dx, dy: tail.dy })
             }
             else {
-                snake.push({ x: (tail.x - tail.dx), y: tail.y, dx: tail.dx, dy: tail.dy, id: tail.id + 1 })
+                snake.push({ x: (tail.x - tail.dx), y: tail.y, dx: tail.dx, dy: tail.dy })
             }
         }
     }
-    else { snackEaten = false; }
 }
 
 function checkForLoss() {
@@ -108,15 +105,12 @@ function moveSnake() {
         for (let j = 0; j < turningPoints.length; j++) {
             var turn = turningPoints[j];
             if (link.x === turn.x && link.y === turn.y) {
-                // Fix checkforeaten()s
+                // When a link reaches a turning point,
+                // it's direction will be changed to the head's direction
                 link.dx = turn.dx;
                 link.dy = turn.dy;
-                if (link.x === tail.x && link.y === tail.y) {
-
-                }
             }
         }
-
         link.x += link.dx;
         link.y += link.dy;
         canvasContext.fillStyle = 'red';
@@ -133,44 +127,29 @@ function maintainSnack() {
 }
 
 function createSnack() {
-    var xs = [];
-    var ys = [];
-    snake.forEach(link => {
-        xs.push(link.x);
-        ys.push(link.y);
-    });
-    var snackPoint = checkSpace(xs, ys);
+    let min = 1;
+    let Xmax = canvas.width / 20 - 1;
+    let randomX = Math.floor(Math.random() * (Xmax - min + 1)) + min;
+    let Ymax = canvas.height / 20 - 1;
+    let randomY = Math.floor(Math.random() * (Ymax - min + 1)) + min;
+    randomX *= 20;
+    randomY *= 20;
+    let superPosition = false;
 
-    snackX = snackPoint[0];
-    snackY = snackPoint[1];
+    for (let i = 0; i < snake.length; i++) {
+        if (snake[i].x === randomX && snake[i].y === randomY) {
+            superPosition = true;
+            break;
+        }
+    }
+
+    if (superPosition) { return createSnack(); }
+    snackX = randomX;
+    snackY = randomY;
     snackEaten = false;
     maintainSnack();
 }
 
-function checkSpace(xs, ys) {
-    var x = checkX(xs);
-    var y = checkY(ys);
-
-    return [x, y];
-}
-
-function checkX(xs) {
-    let min = 1;
-    let max = canvas.width / 20 - 1;
-    let randomX = Math.floor(Math.random() * (max - min + 1)) + min;
-    randomX *= 20;
-    if (xs.includes(randomX)) { return checkX(xs); }
-    return randomX;
-}
-
-function checkY(ys) {
-    let min = 1;
-    let max = canvas.height / 20 - 1;
-    let randomY = Math.floor(Math.random() * (max - min + 1)) + min;
-    randomY *= 20;
-    if (ys.includes(randomY)) { return checkY(ys); }
-    return randomY;
-}
 
 function gameOver() {
     alert('game over');
