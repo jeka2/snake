@@ -9,6 +9,7 @@ var head;
 var tail;
 var score = 0;
 var turnToBeRemoved = false;
+var newGameOption = false;
 var points = document.getElementById('score');
 
 window.onload = function () {
@@ -16,8 +17,8 @@ window.onload = function () {
     canvas = document.getElementById("gameCanvas");
     canvasContext = canvas.getContext("2d");
 
-    createSnake();
     createSnack();
+    createSnake();
     setInterval(gameRun, 200);
 }
 
@@ -37,23 +38,24 @@ function gameRun() {
 
     checkForLoss();
     checkForEaten();
-    moveSnake();
+    createBackground();
     if (snackEaten) {
         createSnack();
     }
     else {
         maintainSnack();
     }
+    moveSnake();
 }
 
-function increaseScore() {
+function updateScore() {
     points.innerHTML = `Score: ${++score}`;
 }
 
 function checkForEaten() {
     if (head.x === snackX && head.y === snackY) {
         snackEaten = true;
-        increaseScore();
+        updateScore();
 
         let linkBeforeLast = snake[snake.length - 2];
         let directionWorkedWith;
@@ -98,8 +100,6 @@ function moveSnake() {
             deleteFirstTurn = true;
         }
     }
-    canvasContext.fillStyle = 'black';
-    canvasContext.fillRect(0, 0, canvas.clientWidth, canvas.height);
     for (let i = 0; i < snake.length; i++) {
         var link = snake[i];
         for (let j = 0; j < turningPoints.length; j++) {
@@ -126,6 +126,11 @@ function maintainSnack() {
     canvasContext.fillRect(snackX, snackY, 19, 19);
 }
 
+function createBackground() {
+    canvasContext.fillStyle = 'black';
+    canvasContext.fillRect(0, 0, canvas.clientWidth, canvas.height);
+}
+
 function createSnack() {
     let min = 1;
     let Xmax = canvas.width / 20 - 1;
@@ -135,7 +140,6 @@ function createSnack() {
     randomX *= 20;
     randomY *= 20;
     let superPosition = false;
-
     for (let i = 0; i < snake.length; i++) {
         if (snake[i].x === randomX && snake[i].y === randomY) {
             superPosition = true;
@@ -147,12 +151,17 @@ function createSnack() {
     snackX = randomX;
     snackY = randomY;
     snackEaten = false;
+
     maintainSnack();
 }
 
 
 function gameOver() {
-    alert('game over');
+    alert("Press Space To Go Again!");
+    score = -1;
+    updateScore();
+    turningPoints = [];
+    createSnake();
 }
 
 window.addEventListener("keydown", (e) => {
